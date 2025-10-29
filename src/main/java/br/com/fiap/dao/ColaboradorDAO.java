@@ -9,68 +9,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ColaboradorDAO {
-    /**
-     * Busca todos os colaboradores no banco de dados
-     * @return lista de objetos de ColaboradorTO com todos os colaboradores ou null se não encontrar
-     */
-    public ArrayList<ColaboradorTO> findAll() {
-        ArrayList<ColaboradorTO> colaboradores = new ArrayList<>();
-        String sql = "SELECT * FROM T_ELO_COLABORADOR";
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs != null) {
-            while (rs.next()) {
-                ColaboradorTO colaboradorEncontrado = new ColaboradorTO();
-                colaboradorEncontrado.setIdColaborador(rs.getLong("id_colaborador"));
-                colaboradorEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
-                colaboradorEncontrado.setTelefone(rs.getString("tl_telefone"));
-                colaboradorEncontrado.setCpf(rs.getString("dc_cpf"));
-                colaboradorEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
-                colaboradorEncontrado.setEmail(rs.getString("em_email"));
-                colaboradorEncontrado.setUnidade(rs.getString("un_unidade"));
-                colaboradores.add(colaboradorEncontrado);
-            }}else{
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro na consulta: " + e.getMessage());
-        }finally {
-            ConnectionFactory.closeConnection();
-        }
-        return colaboradores;
-    }
-
 
     /**
-     * Busca um colaborador no banco de dados
-     * @param id O ID do colaborador a ser buscado
-     * @return objeto ColaboradorTO com os dados do colaborador ou null se não encontrar
+     * Insere um novo colaborador no banco de dados
+     * @param colaboradorTO objeto contendo os dados do colaborador a ser inserido
+     * @return Colaborador salvo confirmando o sucessod da operação ou nulo
      */
-    public ColaboradorTO findById(Long id) {
-        ColaboradorTO colaboradorEncontrado = new ColaboradorTO();
-        String sql = "SELECT * FROM T_ELO_COLABORADOR where id_colaborador=?";
-
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                colaboradorEncontrado.setIdColaborador(rs.getLong("id_colaborador"));
-                colaboradorEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
-                colaboradorEncontrado.setTelefone(rs.getString("tl_telefone"));
-                colaboradorEncontrado.setCpf(rs.getString("dc_cpf"));
-                colaboradorEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
-                colaboradorEncontrado.setEmail(rs.getString("em_email"));
-                colaboradorEncontrado.setUnidade(rs.getString("un_unidade"));
-            }else{
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro na consulta: " + e.getMessage());
-        }finally {
-            ConnectionFactory.closeConnection();
-        }
-        return colaboradorEncontrado;
-    }
 
     public ColaboradorTO save(ColaboradorTO colaboradorTO) {
 
@@ -121,7 +65,7 @@ public class ColaboradorDAO {
             }
 
         } catch (SQLException e) {
-            System.out.println("Erro de SQL: " + e.getMessage());
+            System.out.println("Erro ao Salvar: " + e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
@@ -148,5 +92,69 @@ public class ColaboradorDAO {
         }
         return false;
     }
+
+    /**
+     * Busca todos os colaboradores no banco de dados
+     * @return lista de objetos de ColaboradorTO com todos os colaboradores ou null se não encontrar
+     */
+    public ArrayList<ColaboradorTO> findAll() {
+        ArrayList<ColaboradorTO> colaboradores = new ArrayList<>();
+        String sql = "SELECT * FROM T_ELO_COLABORADOR";
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    ColaboradorTO colaboradorEncontrado = new ColaboradorTO();
+                    colaboradorEncontrado.setIdColaborador(rs.getLong("id_colaborador"));
+                    colaboradorEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                    colaboradorEncontrado.setTelefone(rs.getString("tl_telefone"));
+                    colaboradorEncontrado.setCpf(rs.getString("dc_cpf"));
+                    colaboradorEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                    colaboradorEncontrado.setEmail(rs.getString("em_email"));
+                    colaboradorEncontrado.setUnidade(rs.getString("un_unidade"));
+                    colaboradores.add(colaboradorEncontrado);
+                }}else{
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro na consulta: " + e.getMessage());
+        }finally {
+            ConnectionFactory.closeConnection();
+        }
+        return colaboradores;
+    }
+
+
+    /**
+     * Busca um colaborador no banco de dados
+     * @param id O ID do colaborador a ser buscado
+     * @return objeto ColaboradorTO com os dados do colaborador ou null se não encontrar
+     */
+    public ColaboradorTO findById(Long id) {
+        ColaboradorTO colaboradorEncontrado = new ColaboradorTO();
+        String sql = "SELECT * FROM T_ELO_COLABORADOR where id_colaborador=?";
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                colaboradorEncontrado.setIdColaborador(rs.getLong("id_colaborador"));
+                colaboradorEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                colaboradorEncontrado.setTelefone(rs.getString("tl_telefone"));
+                colaboradorEncontrado.setCpf(rs.getString("dc_cpf"));
+                colaboradorEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                colaboradorEncontrado.setEmail(rs.getString("em_email"));
+                colaboradorEncontrado.setUnidade(rs.getString("un_unidade"));
+            }else{
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro na consulta: " + e.getMessage());
+        }finally {
+            ConnectionFactory.closeConnection();
+        }
+        return colaboradorEncontrado;
+    }
+
 
 }
