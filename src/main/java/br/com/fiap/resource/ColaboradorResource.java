@@ -49,9 +49,9 @@ public class ColaboradorResource {
         ColaboradorTO resultado = colaboradorBO.save(colaborador);
         Response.ResponseBuilder response = null;
         if (resultado != null){
-            response = Response.created(null);  // 201 - CREATED
+            response = Response.created(null);
         } else {
-            response = Response.status(400);  // 401 - BAD REQUEST
+            response = Response.status(400);
         }
         response.entity(resultado);
         return response.build();

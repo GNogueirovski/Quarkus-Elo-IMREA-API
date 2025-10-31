@@ -1,7 +1,10 @@
 package br.com.fiap.resource;
 
 import br.com.fiap.bo.AcompanhanteBO;
+import br.com.fiap.exception.AcompanhanteException;
+import br.com.fiap.exception.PacienteException;
 import br.com.fiap.to.AcompanhanteTO;
+import br.com.fiap.to.ErrorResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -17,88 +20,74 @@ public class AcompanhanteResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@Valid AcompanhanteTO acompanhante) {
-        AcompanhanteTO resultado = acompanhanteBO.save(acompanhante);
-        Response.ResponseBuilder response = null;
-        if (resultado != null){
-            response = Response.created(null);  // 201 - CREATED
-        } else {
-            response = Response.status(400);  // 401 - BAD REQUEST
-        }
-        response.entity(resultado);
-        return response.build();
-    }
+        try {
+            AcompanhanteTO resultado = acompanhanteBO.save(acompanhante);
+            if (resultado == null) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            return Response.status(Response.Status.CREATED).entity(resultado).build();
 
-    @DELETE
-    @Path("/{codigo}")
-    public Response delete(@PathParam("codigo") Long codigo) {
-        Response.ResponseBuilder response = null;
-        if (acompanhanteBO.delete(codigo)){
-            response = Response.status(204);  // 204 - NO CONTENT
-        } else {
-            response = Response.status(404);  // 404 - NOT FOUND
+        } catch (AcompanhanteException | PacienteException e) {
+            ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-        return response.build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response update(@Valid AcompanhanteTO acompanhante, @PathParam("id") Long id) {
-        acompanhante.setIdAcompanhante(id);
-        AcompanhanteTO resultado = acompanhanteBO.update(acompanhante);
-        Response.ResponseBuilder response = null;
-        if (resultado != null){
-            response = Response.created(null);  // 201 - CREATED
-        } else {
-            response = Response.status(400);  // 400 - BAD REQUEST
+        try {
+            acompanhante.setIdAcompanhante(id);
+            AcompanhanteTO resultado = acompanhanteBO.update(acompanhante);
+            if (resultado == null) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            return Response.status(Response.Status.OK).entity(resultado).build();
+        } catch (AcompanhanteException | PacienteException e) {
+            ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-        response.entity(resultado);
-        return response.build();
     }
+
+    @DELETE
+    @Path("/{codigo}")
+    public Response delete(@PathParam("codigo") Long codigo) {
+        if (acompanhanteBO.delete(codigo)) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAll() {
         ArrayList<AcompanhanteTO> resultado = acompanhanteBO.findAll();
-        Response.ResponseBuilder response = null;
-        if (resultado != null) {
-            response = Response.ok(); // 200 - OK
-        }
-        else {
-            response = Response.status(404);  // 404 - NOT FOUND
-        }
-        response.entity(resultado);
-        return response.build();
+        return Response.status(Response.Status.OK).entity(resultado).build();
     }
 
     @GET
     @Path("/paciente/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAllByPaciente(@PathParam("id") Long id) {
-        ArrayList<AcompanhanteTO> resultado = acompanhanteBO.findAllByPaciente(id);
-        Response.ResponseBuilder response = null;
-        if (resultado != null) {
-            response = Response.ok();  // 200 (OK)
-        } else {
-            response = Response.status(404);  // 404 (NOT FOUND)
+        try {
+            ArrayList<AcompanhanteTO> resultado = acompanhanteBO.findAllByPaciente(id);
+            return Response.status(Response.Status.OK).entity(resultado).build();
+        } catch (PacienteException e) {
+            ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-        response.entity(resultado);
-        return response.build();
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findByCodigo(@PathParam("id") Long id) {
+    public Response findById(@PathParam("id") Long id) {
         AcompanhanteTO resultado = acompanhanteBO.findById(id);
-        Response.ResponseBuilder response = null;
-        if (resultado != null) {
-            response = Response.ok();  // 200 (OK)
-        } else {
-            response = Response.status(404);  // 404 (NOT FOUND)
-        }
-        response.entity(resultado);
-        return response.build();
+        if (resultado == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } return Response.status(Response.Status.OK).entity(resultado).build();
     }
 
 }

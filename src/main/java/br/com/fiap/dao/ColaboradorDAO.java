@@ -1,6 +1,7 @@
 package br.com.fiap.dao;
 
 import br.com.fiap.to.ColaboradorTO;
+import br.com.fiap.to.ColaboradorTO;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -151,6 +152,37 @@ public class ColaboradorDAO {
         } catch (SQLException e) {
             System.out.println("Erro na consulta: " + e.getMessage());
         }finally {
+            ConnectionFactory.closeConnection();
+        }
+        return colaboradorEncontrado;
+    }
+
+    /**
+     * Busca um colaborador específico no banco de dados a partir do CPF
+     * @param cpf do colaborador a ser buscado
+     * @return objeto colaboradorTO com os dados do colaborador encontrado ou null
+     */
+    public ColaboradorTO findByCpf(String cpf) {
+        ColaboradorTO colaboradorEncontrado = new ColaboradorTO();
+        String sql = "SELECT * FROM T_ELO_COLABORADOR where dc_cpf=?";
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                colaboradorEncontrado.setIdColaborador(rs.getLong("id_colaborador"));
+                colaboradorEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                colaboradorEncontrado.setCpf(rs.getString("dc_cpf"));
+                colaboradorEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                colaboradorEncontrado.setTelefone(rs.getString("tl_telefone"));
+                colaboradorEncontrado.setEmail(rs.getString("em_email"));
+                colaboradorEncontrado.setUnidade(rs.getString("un_unidade"));
+            }else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro no comando SQL " + e.getMessage());
+        } finally {
             ConnectionFactory.closeConnection();
         }
         return colaboradorEncontrado;

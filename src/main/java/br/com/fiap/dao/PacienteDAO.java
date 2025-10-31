@@ -189,4 +189,36 @@ public class PacienteDAO {
         }
         return pacienteEncontrado;
     }
+
+    /**
+     * Busca um paciente específico no banco de dados a partir do CPF
+     * @param cpf do paciente a ser buscado
+     * @return objeto PacienteTO com os dados do paciente encontrado ou null
+     */
+    public PacienteTO findByCpf(String cpf) {
+        PacienteTO pacienteEncontrado = new PacienteTO();
+        String sql = "SELECT * FROM T_ELO_PACIENTE where dc_cpf=?";
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                pacienteEncontrado.setIdPaciente(rs.getLong("id_paciente"));
+                pacienteEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                pacienteEncontrado.setCpf(rs.getString("dc_cpf"));
+                pacienteEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                pacienteEncontrado.setTelefone(rs.getString("tl_telefone"));
+                pacienteEncontrado.setEmail(rs.getString("em_email"));
+                pacienteEncontrado.setDiagnostico(rs.getString("dg_diagnostico"));
+            }else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro no comando SQL " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return pacienteEncontrado;
+    }
+
 }

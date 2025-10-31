@@ -3,55 +3,60 @@ package br.com.fiap.bo;
 import br.com.fiap.dao.AcompanhanteDAO;
 import br.com.fiap.dao.PacienteDAO;
 import br.com.fiap.exception.AcompanhanteException;
+import br.com.fiap.exception.PacienteException;
 import br.com.fiap.to.AcompanhanteTO;
-import br.com.fiap.to.PacienteTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class AcompanhanteBO {
-    public AcompanhanteTO save(AcompanhanteTO acompanhanteTO) {
-        try{
-            LocalDate dataLimiteNascimento = LocalDate.now().minusYears(18);
-            LocalDate dataNascimento = acompanhanteTO.getDataNascimento();
+    public AcompanhanteTO save(AcompanhanteTO acompanhanteTO) throws AcompanhanteException, PacienteException {
 
-
-            PacienteDAO pacienteDAO = new PacienteDAO();
-            PacienteTO pacienteEncontrado = pacienteDAO.findById( acompanhanteTO.getIdPaciente());
-
-            if(pacienteEncontrado == null){
-                throw new AcompanhanteException("Paciente: Não foi encontrado nenhum paciente para vincular a esse acompanhante");
-            }
-
-            if (dataNascimento.isAfter(dataLimiteNascimento) || dataNascimento.minusDays(1).isEqual(dataLimiteNascimento)) {
-                throw new AcompanhanteException("Acompanhante: O acompanhante deve ter pelo menos 18 anos");
-            }
-
-            String telefone = acompanhanteTO.getTelefone();
-            String cpf = acompanhanteTO.getCpf();
-            acompanhanteTO.setCpf(cpf.replace(".", "").replace("-", ""));
-            acompanhanteTO.setTelefone(telefone.replace("(", "").replace("-", "").replace(")", "").replace(" ", ""));
-
-            AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
-            return acompanhanteDAO.save(acompanhanteTO);
-
-        } catch (AcompanhanteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public AcompanhanteTO update(AcompanhanteTO acompanhanteTO) {
         String telefone = acompanhanteTO.getTelefone();
         String cpf = acompanhanteTO.getCpf();
         acompanhanteTO.setCpf(cpf.replace(".", "").replace("-", ""));
         acompanhanteTO.setTelefone(telefone.replace("(", "").replace("-", "").replace(")", "").replace(" ", ""));
 
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
-        if (acompanhanteDAO.findById(acompanhanteTO.getIdAcompanhante()) == null) {
-            throw new RuntimeException("Acompanhante não encontrado");
+        PacienteDAO pacienteDAO = new PacienteDAO();
+
+        if (pacienteDAO.findById(acompanhanteTO.getIdPaciente()) == null) {
+            throw new PacienteException("Não foi encontrado nenhum paciente para vincular a esse acompanhante");
         }
+        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+
+        if (acompanhanteDAO.findByCpf(acompanhanteTO.getCpf()) != null) {
+            throw new AcompanhanteException("Já existe um acompanhante cadastrado com o CPF informado");
+        }
+
+        LocalDate dataLimiteNascimento = LocalDate.now().minusYears(18);
+        LocalDate dataNascimento = acompanhanteTO.getDataNascimento();
+
+        if (dataNascimento.isAfter(dataLimiteNascimento) || dataNascimento.minusDays(1).isEqual(dataLimiteNascimento)) {
+            throw new AcompanhanteException("O acompanhante deve ter pelo menos 18 anos");
+        }
+        return acompanhanteDAO.save(acompanhanteTO);
+    }
+
+    public AcompanhanteTO update(AcompanhanteTO acompanhanteTO) throws AcompanhanteException, PacienteException {
+        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+
+        if (acompanhanteDAO.findById(acompanhanteTO.getIdAcompanhante()) == null) {
+            throw new AcompanhanteException("Não existe nenhum acompanhante com o ID informado");
+        }
+        PacienteDAO pacienteDAO = new PacienteDAO();
+
+        if (pacienteDAO.findById(acompanhanteTO.getIdPaciente()) == null) {
+            throw new PacienteException("Não existe um paciente com o ID informado.");
+        }
+
+        String telefone = acompanhanteTO.getTelefone();
+        String cpf = acompanhanteTO.getCpf();
+        acompanhanteTO.setCpf(cpf.replace(".", "").replace("-", ""));
+        acompanhanteTO.setTelefone(telefone.replace("(", "").replace("-", "").replace(")", "").replace(" ", ""));
+
         return acompanhanteDAO.update(acompanhanteTO);
     }
+
     public boolean delete(Long id) {
         AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.delete(id);
@@ -67,11 +72,10 @@ public class AcompanhanteBO {
         return acompanhanteDAO.findById(id);
     }
 
-    //todo verificar se existe paciente, se nao nulo pro status code correto
-    public ArrayList<AcompanhanteTO> findAllByPaciente(Long idPaciente) {
+    public ArrayList<AcompanhanteTO> findAllByPaciente(Long idPaciente) throws PacienteException {
         PacienteDAO pacienteDAO = new PacienteDAO();
         if (pacienteDAO.findById(idPaciente) == null) {
-            throw new RuntimeException("nao tem esse maluco");
+            throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
         AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.findAllByPaciente(idPaciente);

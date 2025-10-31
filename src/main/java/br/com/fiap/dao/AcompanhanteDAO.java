@@ -196,4 +196,36 @@ public class AcompanhanteDAO {
         return acompanhantes;
     }
 
+    /**
+     * Busca um acompanhante específico no banco de dados a partir do CPF
+     * @param cpf do acompanhante a ser buscado
+     * @return objeto acompanhanteTO com os dados do acompanhante encontrado ou null
+     */
+    public AcompanhanteTO findByCpf(String cpf) {
+        AcompanhanteTO acompanhanteEncontrado = new AcompanhanteTO();
+        String sql = "SELECT * FROM T_ELO_ACOMPANHANTE where dc_cpf=?";
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, cpf);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                acompanhanteEncontrado.setIdPaciente(rs.getLong("id_paciente"));
+                acompanhanteEncontrado.setIdAcompanhante(rs.getLong("id_acompanhante"));
+                acompanhanteEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                acompanhanteEncontrado.setCpf(rs.getString("dc_cpf"));
+                acompanhanteEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                acompanhanteEncontrado.setTelefone(rs.getString("tl_telefone"));
+                acompanhanteEncontrado.setEmail(rs.getString("em_email"));
+                acompanhanteEncontrado.setParentesco(rs.getString("pr_parentesco"));
+            }else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro no comando SQL " + e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return acompanhanteEncontrado;
+    }
+
 }
