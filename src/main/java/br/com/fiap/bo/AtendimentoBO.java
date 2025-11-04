@@ -9,6 +9,7 @@ import br.com.fiap.exception.AtendimentoException;
 import br.com.fiap.exception.PacienteException;
 import br.com.fiap.exception.ProfissionalSaudeException;
 import br.com.fiap.to.AtendimentoTO;
+import br.com.fiap.to.ProfissionalSaudeTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,10 +32,27 @@ public class AtendimentoBO {
         if (atendimentoTO.getData().isBefore(LocalDate.now())) {
             throw new AtendimentoException("Não é possível agendar um atendimento em uma data passada.");
         }
+        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+
+        // verifica se o paciente ja tem outro atendimento no mesmo horario
+        AtendimentoTO atendimentoPaciente = atendimentoDAO.findAllByPaciente(atendimentoTO.getIdPaciente()).stream()
+                .filter(a -> a.getData().isEqual(atendimentoTO.getData()) && a.getHora().equals(atendimentoTO.getHora())
+                        && (a.getStatus() == StatusAtendimento.MARCADO || a.getStatus() == StatusAtendimento.REMARCADO)).findFirst().orElse(null);
+        if (atendimentoPaciente != null) {
+            throw new PacienteException("Já existe um atendimento agendado para este paciente na data e hora informadas.");
+        }
+
+        // verifica se o profissional ja tem outro atendimento no mesmo horario
+        AtendimentoTO atendimentoProfissional = atendimentoDAO.findAllByProfissional(atendimentoTO.getIdProfissionalSaude()).stream()
+                .filter(a -> a.getData().isEqual(atendimentoTO.getData()) && a.getHora().equals(atendimentoTO.getHora())
+                        && (a.getStatus() == StatusAtendimento.MARCADO || a.getStatus() == StatusAtendimento.REMARCADO)).findFirst().orElse(null);
+
+        if (atendimentoProfissional != null) {
+            throw new ProfissionalSaudeException("Já existe um atendimento agendado para este profissional da saúde na data e hora informadas.");
+        }
 
         atendimentoTO.setStatus(StatusAtendimento.MARCADO);
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
         return atendimentoDAO.save(atendimentoTO);
     }
 
@@ -65,6 +83,43 @@ public class AtendimentoBO {
             throw new ProfissionalSaudeException("Não existe nenhum profissional da saúde com o ID informado");
         }
 
+        if (atendimentoTO.getStatus() != StatusAtendimento.CANCELADO) {
+            // verifica se o paciente ja tem outro atendimento no mesmo horario
+            AtendimentoTO atendimentoPaciente = atendimentoDAO.findAllByPaciente(atendimentoTO.getIdPaciente()).stream()
+                    .filter(a -> a.getData().isEqual(atendimentoTO.getData()) && a.getHora().equals(atendimentoTO.getHora())
+                            && (a.getStatus() == StatusAtendimento.MARCADO || a.getStatus() == StatusAtendimento.REMARCADO)
+                            && !a.getIdAtendimento().equals(atendimentoTO.getIdAtendimento())) //
+                    .findFirst().orElse(null);
+
+            if (atendimentoPaciente != null) {
+                throw new PacienteException("Paciente já possui outro atendimento agendado neste novo horário.");
+            }
+
+            // verifica se o profissional ja tem outro atendimento no mesmo horario
+            AtendimentoTO atendimentoProfissional = atendimentoDAO.findAllByProfissional(atendimentoTO.getIdProfissionalSaude()).stream()
+                    .filter(a -> a.getData().isEqual(atendimentoTO.getData()) && a.getHora().equals(atendimentoTO.getHora())
+                            && (a.getStatus() == StatusAtendimento.MARCADO || a.getStatus() == StatusAtendimento.REMARCADO)
+                            && !a.getIdAtendimento().equals(atendimentoTO.getIdAtendimento()))
+                    .findFirst().orElse(null);
+
+            if (atendimentoProfissional != null) {
+                throw new ProfissionalSaudeException("Profissional já possui outro atendimento agendado neste novo horário.");
+            }
+
+            boolean dataOuHoraAlterada = !atendimentoEncontrado.getData().isEqual(atendimentoTO.getData()) ||
+                    !atendimentoEncontrado.getHora().equals(atendimentoTO.getHora());
+
+            if (dataOuHoraAlterada) {
+                if (atendimentoEncontrado.getStatus() == StatusAtendimento.MARCADO ||
+                        atendimentoEncontrado.getStatus() == StatusAtendimento.REMARCADO) {
+                    atendimentoTO.setStatus(StatusAtendimento.REMARCADO);
+                }
+            } else {
+                atendimentoTO.setStatus(atendimentoEncontrado.getStatus());
+            }
+
+        }
+
         return atendimentoDAO.update(atendimentoTO);
     }
 
@@ -82,6 +137,24 @@ public class AtendimentoBO {
         }
 
         atendimento.setStatus(StatusAtendimento.CONCLUIDO);
+
+        return atendimentoDAO.update(atendimento);
+    }
+
+    public AtendimentoTO cancelar(Long id) throws AtendimentoException {
+
+        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+
+        AtendimentoTO atendimento = atendimentoDAO.findById(id);
+        if (atendimento == null) {
+            throw new AtendimentoException("Não existe nenhum atendimento com o ID informado.");
+        }
+
+        if (atendimento.getStatus() != StatusAtendimento.MARCADO && atendimento.getStatus() != StatusAtendimento.REMARCADO) {
+            throw new AtendimentoException("Só é possível cancelar atendimentos Marcados ou Remarcados.");
+        }
+
+        atendimento.setStatus(StatusAtendimento.CANCELADO);
 
         return atendimentoDAO.update(atendimento);
     }

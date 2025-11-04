@@ -1,9 +1,11 @@
 package br.com.fiap.bo;
 
 import br.com.fiap.dao.AcompanhanteDAO;
+import br.com.fiap.dao.AtendimentoDAO;
 import br.com.fiap.dao.PacienteDAO;
 import br.com.fiap.exception.AcompanhanteException;
 import br.com.fiap.exception.PacienteException;
+import br.com.fiap.to.AtendimentoTO;
 import br.com.fiap.to.PacienteTO;
 
 import java.util.ArrayList;
@@ -46,8 +48,20 @@ public class PacienteBO {
 
         return pacienteDAO.update(pacienteTO);
     }
-    public boolean delete(Long id) {
+    public boolean delete(Long id) throws PacienteException {
         PacienteDAO pacienteDAO = new PacienteDAO();
+        if (pacienteDAO.findById(id) == null) {
+            return false;
+        }
+        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        if (!atendimentoDAO.findAllByPaciente(id).isEmpty()) {
+            throw new PacienteException("Não é possível excluir o paciente, pois existem atendimentos associados a ele.");
+        }
+        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        if (!acompanhanteDAO.findAllByPaciente(id).isEmpty()) {
+            throw new PacienteException("Não é possível excluir o paciente, pois existem acompanhantes associados a ele.");
+        }
+
         return pacienteDAO.delete(id);
     }
 

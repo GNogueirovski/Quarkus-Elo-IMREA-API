@@ -51,10 +51,15 @@ public class ColaboradorResource {
     @DELETE
     @Path("/{codigo}")
     public Response delete(@PathParam("codigo") Long codigo) {
-        if (colaboradorBO.delete(codigo)) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+        try {
+            if (colaboradorBO.delete(codigo)) {
+                return Response.status(Response.Status.NO_CONTENT).build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } catch (ColaboradorException e) {
+            ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
 
@@ -72,7 +77,8 @@ public class ColaboradorResource {
         ColaboradorTO resultado = colaboradorBO.findById(id);
         if (resultado == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
-        } return Response.status(Response.Status.OK).entity(resultado).build();
+        }
+        return Response.status(Response.Status.OK).entity(resultado).build();
     }
 
 }

@@ -63,12 +63,44 @@ public class LembreteBO {
     }
 
     public LembreteTO reenviar(Long id) throws LembreteException {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         LembreteDAO lembreteDAO = new LembreteDAO();
         LembreteTO lembrete = lembreteDAO.findById(id);
+
         if (lembrete == null) {
             throw new LembreteException("Não existe nenhum lembrete com o ID informado.");
         }
 
+        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        AtendimentoTO atendimento = atendimentoDAO.findById(lembrete.getIdAtendimento());
+
+        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        ProfissionalSaudeTO profissional = profissionalSaudeDAO.findById(atendimento.getIdProfissionalSaude());
+
+
+        PacienteDAO pacienteDAO = new PacienteDAO();
+        PacienteTO paciente = pacienteDAO.findById(atendimento.getIdPaciente());
+
+        String assunto = String.format(" IMREA: Consulta com %s dia %s",
+                profissional.getEspecialidade(),
+                atendimento.getData().format(dtf));
+
+        String mensagem = String.format(
+                "\nOlá Sr(a) %s,\nEstamos passando para lembrar que seu atendimento foi %s.\n \nProfissional: %s (%s)\nFormato: %s \nLocal/Link: %s \nData: %s às %s",
+                paciente.getNomeCompleto(),
+                atendimento.getStatus().name(),
+                profissional.getNomeCompleto(),
+                profissional.getEspecialidade(),
+                atendimento.getFormatoAtendimento(),
+                atendimento.getLocal(),
+                atendimento.getData().format(dtf),
+                atendimento.getHora().toString()
+        );
+
+        lembrete.setAssunto(assunto);
+        lembrete.setMensagem(mensagem);
         lembrete.setStatus(StatusLembrete.REENVIADO);
         lembrete.setDataEnvio(LocalDate.now());
 

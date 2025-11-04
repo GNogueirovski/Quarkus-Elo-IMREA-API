@@ -1,5 +1,6 @@
 package br.com.fiap.bo;
 
+import br.com.fiap.dao.AtendimentoDAO;
 import br.com.fiap.dao.ProfissionalSaudeDAO;
 import br.com.fiap.exception.ProfissionalSaudeException;
 import br.com.fiap.to.ProfissionalSaudeTO;
@@ -17,6 +18,10 @@ public class ProfissionalSaudeBO {
         ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
         if(profissionalSaudeDAO.findByCpf(cpf) != null) {
             throw new ProfissionalSaudeException("Já existe um profissional de saúde cadastrado com o CPF informado");
+        }
+
+        if (profissionalSaudeDAO.findByDocumento(profissionalSaudeTO.getDocumento()) != null) {
+            throw new ProfissionalSaudeException("Já existe um profissional de saúde cadastrado com o documento informado");
         }
 
         return profissionalSaudeDAO.save(profissionalSaudeTO);
@@ -42,8 +47,16 @@ public class ProfissionalSaudeBO {
 
         return profissionalSaudeDAO.update(profissionalSaudeTO);
     }
-    public boolean delete(Long id) {
+    public boolean delete(Long id) throws ProfissionalSaudeException {
         ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        if (profissionalSaudeDAO.findById(id) == null) {
+            return false;
+        }
+        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        if(!atendimentoDAO.findAllByProfissional(id).isEmpty()){
+            throw new ProfissionalSaudeException("Não é possível excluir o profissional de saúde pois existem atendimentos vinculados a ele.");
+        }
+
         return profissionalSaudeDAO.delete(id);
     }
 

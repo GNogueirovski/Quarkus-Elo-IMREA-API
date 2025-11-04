@@ -19,7 +19,6 @@ public class AtendimentoTO {
     @NotNull (message = "O atributo data do atendimento é obrigatorio")
     @FutureOrPresent(message = "A data do atendimento tem que ser no futuro")
     private LocalDate data;
-    @FutureOrPresent(message = "A hora do atendimento tem que ser no futuro")
     @NotNull (message = "O atributo hora do atendimento é obrigatorio")
     private LocalTime hora;
     @NotBlank (message = "O atributo local é obrigatorio")

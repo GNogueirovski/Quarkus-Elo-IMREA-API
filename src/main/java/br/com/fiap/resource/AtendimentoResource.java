@@ -75,6 +75,21 @@ public class AtendimentoResource {
         }
     }
 
+    @PUT
+    @Path("/{id}/cancelar")
+    public Response cancelarAtendimento(@PathParam("id") Long id) {
+        try {
+            AtendimentoTO resultado = atendimentoBO.cancelar(id);
+            if(resultado == null) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            return Response.status(Response.Status.OK).entity(resultado).build();
+        } catch (AtendimentoException e) {
+            ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

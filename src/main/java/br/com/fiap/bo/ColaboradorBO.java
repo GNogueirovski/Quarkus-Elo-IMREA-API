@@ -1,6 +1,8 @@
 package br.com.fiap.bo;
 
+import br.com.fiap.dao.AtendimentoDAO;
 import br.com.fiap.dao.ColaboradorDAO;
+import br.com.fiap.dao.LembreteDAO;
 import br.com.fiap.exception.ColaboradorException;
 import br.com.fiap.to.ColaboradorTO;
 
@@ -41,8 +43,16 @@ public class ColaboradorBO {
 
         return colaboradorDAO.update(colaboradorTO);
     }
-    public boolean delete(Long id) {
+    public boolean delete(Long id) throws ColaboradorException {
         ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
+        if (colaboradorDAO.findById(id) == null) {
+            return false;
+        }
+        LembreteDAO lembreteDAO = new LembreteDAO();
+        if(!lembreteDAO.findAllByColaborador(id).isEmpty()){
+            throw new ColaboradorException("Não é possível excluir o colaborador pois existem lembretes vinculados a ele.");
+        }
+
         return colaboradorDAO.delete(id);
     }
 

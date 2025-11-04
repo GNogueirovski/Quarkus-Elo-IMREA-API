@@ -215,4 +215,40 @@ public class ProfissionalSaudeDAO {
         }
         return profissionalSaudeEncontrado;
     }
+
+    /**
+     * Busca um profissionalSaude específico no banco de dados a partir do CPF
+     *
+     * @param documento do profissionalSaude a ser buscado
+     * @return objeto profissionalSaudeTO com os dados do profissionalSaude encontrado ou null
+     */
+    public ProfissionalSaudeTO findByDocumento(String documento) {
+        ProfissionalSaudeTO profissionalSaudeEncontrado = new ProfissionalSaudeTO();
+        String sql = "SELECT * FROM T_ELO_PROFISSIONAL_SAUDE where nm_documento=?";
+
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+            ps.setString(1, documento);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                profissionalSaudeEncontrado.setIdProfissionalSaude(rs.getLong("id_profissional_saude"));
+                profissionalSaudeEncontrado.setNomeCompleto(rs.getString("nc_nome_completo"));
+                profissionalSaudeEncontrado.setTelefone(rs.getString("tl_telefone"));
+                profissionalSaudeEncontrado.setCpf(rs.getString("dc_cpf"));
+                profissionalSaudeEncontrado.setDataNascimento(rs.getDate("dt_data_nascimento").toLocalDate());
+                profissionalSaudeEncontrado.setEmail(rs.getString("em_email"));
+                profissionalSaudeEncontrado.setUrlFoto(rs.getString("url_foto"));
+                profissionalSaudeEncontrado.setTipoDocumento(rs.getString("tp_tipo_documento"));
+                profissionalSaudeEncontrado.setDocumento(rs.getString("nm_documento"));
+                profissionalSaudeEncontrado.setEspecialidade(rs.getString("es_especialidade"));
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro no comando SQL " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            ConnectionFactory.closeConnection();
+        }
+        return profissionalSaudeEncontrado;
+    }
 }
