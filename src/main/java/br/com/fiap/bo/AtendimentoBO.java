@@ -15,15 +15,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class AtendimentoBO {
+    private AtendimentoDAO atendimentoDAO;
+    private PacienteDAO pacienteDAO;
+    private ProfissionalSaudeDAO profissionalSaudeDAO;
+    private LembreteDAO lembreteDAO;
+
     public AtendimentoTO save(AtendimentoTO atendimentoTO) throws ProfissionalSaudeException, PacienteException, AtendimentoException {
 
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
 
         if (pacienteDAO.findById(atendimentoTO.getIdPaciente()) == null) {
             throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
 
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+       profissionalSaudeDAO = new ProfissionalSaudeDAO();
 
         if (profissionalSaudeDAO.findById(atendimentoTO.getIdProfissionalSaude()) == null) {
             throw new ProfissionalSaudeException("Não existe nenhum profissional da saúde com o ID informado");
@@ -32,7 +37,7 @@ public class AtendimentoBO {
         if (atendimentoTO.getData().isBefore(LocalDate.now())) {
             throw new AtendimentoException("Não é possível agendar um atendimento em uma data passada.");
         }
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
 
         // verifica se o paciente ja tem outro atendimento no mesmo horario
         AtendimentoTO atendimentoPaciente = atendimentoDAO.findAllByPaciente(atendimentoTO.getIdPaciente()).stream()
@@ -58,7 +63,7 @@ public class AtendimentoBO {
 
     public AtendimentoTO update(AtendimentoTO atendimentoTO) throws ProfissionalSaudeException, PacienteException, AtendimentoException {
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
 
         AtendimentoTO atendimentoEncontrado = atendimentoDAO.findById(atendimentoTO.getIdAtendimento());
         if (atendimentoEncontrado == null) {
@@ -125,7 +130,7 @@ public class AtendimentoBO {
 
     public AtendimentoTO concluir(Long id) throws AtendimentoException {
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
 
         AtendimentoTO atendimento = atendimentoDAO.findById(id);
         if (atendimento == null) {
@@ -143,7 +148,7 @@ public class AtendimentoBO {
 
     public AtendimentoTO cancelar(Long id) throws AtendimentoException {
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
 
         AtendimentoTO atendimento = atendimentoDAO.findById(id);
         if (atendimento == null) {
@@ -160,35 +165,35 @@ public class AtendimentoBO {
     }
 
     public boolean delete(Long id) {
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
 
         if (atendimentoDAO.findById(id) == null) {
             return false;
         }
 
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         lembreteDAO.deleteByAtendimento(id);
 
         return atendimentoDAO.delete(id);
     }
 
     public ArrayList<AtendimentoTO> findAll() {
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         return atendimentoDAO.findAll();
     }
 
     public AtendimentoTO findById(Long id) {
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         return atendimentoDAO.findById(id);
     }
 
     public ArrayList<AtendimentoTO> findAllByPaciente(Long idPaciente) throws PacienteException {
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         if (pacienteDAO.findById(idPaciente) == null) {
             throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         return atendimentoDAO.findAllByPaciente(idPaciente);
     }
 

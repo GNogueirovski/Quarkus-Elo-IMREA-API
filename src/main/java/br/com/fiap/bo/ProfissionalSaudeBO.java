@@ -8,6 +8,9 @@ import br.com.fiap.to.ProfissionalSaudeTO;
 import java.util.ArrayList;
 
 public class ProfissionalSaudeBO {
+    private ProfissionalSaudeDAO profissionalSaudeDAO;
+    private AtendimentoDAO atendimentoDAO;
+
     public ProfissionalSaudeTO save(ProfissionalSaudeTO profissionalSaudeTO) throws ProfissionalSaudeException {
         String telefone = profissionalSaudeTO.getTelefone().replace("(", "").replace("-", "").replace(")", "").replace(" ", "");
         String cpf = profissionalSaudeTO.getCpf().replace(".", "").replace("-", "");
@@ -15,7 +18,7 @@ public class ProfissionalSaudeBO {
         profissionalSaudeTO.setCpf(cpf);
         profissionalSaudeTO.setTelefone(telefone);
 
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         if(profissionalSaudeDAO.findByCpf(cpf) != null) {
             throw new ProfissionalSaudeException("Já existe um profissional de saúde cadastrado com o CPF informado");
         }
@@ -34,7 +37,7 @@ public class ProfissionalSaudeBO {
         profissionalSaudeTO.setCpf(cpf);
         profissionalSaudeTO.setTelefone(telefone);
 
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
 
         if(profissionalSaudeDAO.findById(profissionalSaudeTO.getIdProfissionalSaude()) == null) {
             throw new ProfissionalSaudeException("Não existe nenhum profissional de saúde com o ID informado");
@@ -48,11 +51,11 @@ public class ProfissionalSaudeBO {
         return profissionalSaudeDAO.update(profissionalSaudeTO);
     }
     public boolean delete(Long id) throws ProfissionalSaudeException {
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         if (profissionalSaudeDAO.findById(id) == null) {
             return false;
         }
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         if(!atendimentoDAO.findAllByProfissional(id).isEmpty()){
             throw new ProfissionalSaudeException("Não é possível excluir o profissional de saúde pois existem atendimentos vinculados a ele.");
         }
@@ -61,12 +64,12 @@ public class ProfissionalSaudeBO {
     }
 
     public ArrayList<ProfissionalSaudeTO> findAll() {
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         return profissionalSaudeDAO.findAll();
     }
 
     public ProfissionalSaudeTO findById(Long id) {
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         return profissionalSaudeDAO.findById(id);
     }
 

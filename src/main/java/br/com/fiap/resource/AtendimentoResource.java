@@ -1,13 +1,12 @@
 package br.com.fiap.resource;
 
 import br.com.fiap.bo.AtendimentoBO;
-import br.com.fiap.exception.AcompanhanteException;
-import br.com.fiap.exception.AtendimentoException;
-import br.com.fiap.exception.PacienteException;
-import br.com.fiap.exception.ProfissionalSaudeException;
+import br.com.fiap.bo.LembreteBO;
+import br.com.fiap.exception.*;
 import br.com.fiap.to.AtendimentoTO;
 import br.com.fiap.to.AtendimentoTO;
 import br.com.fiap.to.ErrorResponse;
+import br.com.fiap.to.LembreteTO;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 @Path("/atendimento")
 public class AtendimentoResource {
     private AtendimentoBO atendimentoBO = new AtendimentoBO();
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response save(@Valid AtendimentoTO atendimento) {
@@ -27,7 +27,6 @@ public class AtendimentoResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             return Response.status(Response.Status.CREATED).entity(resultado).build();
-
         } catch (PacienteException | ProfissionalSaudeException | AtendimentoException e) {
             ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
@@ -52,9 +51,9 @@ public class AtendimentoResource {
     }
 
     @DELETE
-    @Path("/{codigo}")
-    public Response delete(@PathParam("codigo") Long codigo) {
-        if (atendimentoBO.delete(codigo)) {
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+        if (atendimentoBO.delete(id)) {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();

@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class AcompanhanteBO {
+    private AcompanhanteDAO acompanhanteDAO;
+    private PacienteDAO pacienteDAO;
+
     public AcompanhanteTO save(AcompanhanteTO acompanhanteTO) throws AcompanhanteException, PacienteException {
 
         String telefone = acompanhanteTO.getTelefone().replace("(", "").replace("-", "").replace(")", "").replace(" ", "");
@@ -17,12 +20,12 @@ public class AcompanhanteBO {
         acompanhanteTO.setCpf(cpf);
         acompanhanteTO.setTelefone(telefone);
 
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
 
         if (pacienteDAO.findById(acompanhanteTO.getIdPaciente()) == null) {
             throw new PacienteException("Não foi encontrado nenhum paciente para vincular a esse acompanhante");
         }
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        acompanhanteDAO = new AcompanhanteDAO();
 
         if (acompanhanteDAO.findByCpf(cpf) != null) {
             throw new AcompanhanteException("Já existe um acompanhante cadastrado com o CPF informado");
@@ -44,9 +47,9 @@ public class AcompanhanteBO {
         acompanhanteTO.setCpf(cpf);
         acompanhanteTO.setTelefone(telefone);
 
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        acompanhanteDAO = new AcompanhanteDAO();
 
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
 
         if (acompanhanteDAO.findById(acompanhanteTO.getIdAcompanhante()) == null) {
             throw new AcompanhanteException("Não existe nenhum acompanhante com o ID informado");
@@ -66,26 +69,26 @@ public class AcompanhanteBO {
     }
 
     public boolean delete(Long id) {
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.delete(id);
     }
 
     public ArrayList<AcompanhanteTO> findAll() {
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.findAll();
     }
 
     public AcompanhanteTO findById(Long id) {
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+        acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.findById(id);
     }
 
     public ArrayList<AcompanhanteTO> findAllByPaciente(Long idPaciente) throws PacienteException {
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         if (pacienteDAO.findById(idPaciente) == null) {
             throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
-        AcompanhanteDAO acompanhanteDAO = new AcompanhanteDAO();
+       acompanhanteDAO = new AcompanhanteDAO();
         return acompanhanteDAO.findAllByPaciente(idPaciente);
     }
 

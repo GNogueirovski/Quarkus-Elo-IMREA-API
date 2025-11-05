@@ -10,28 +10,35 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class LembreteBO {
+    private LembreteDAO lembreteDAO;
+    private AtendimentoDAO atendimentoDAO;
+    private ColaboradorDAO colaboradorDAO;
+    private PacienteDAO pacienteDAO;
+    private ProfissionalSaudeDAO profissionalSaudeDAO;
+
+
     public LembreteTO save(LembreteTO lembreteTO) throws AtendimentoException, ColaboradorException, PacienteException, ProfissionalSaudeException {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         AtendimentoTO atendimento = atendimentoDAO.findById(lembreteTO.getIdAtendimento());
         if (atendimento == null) {
             throw new AtendimentoException("Não existe um atendimento com o id informado.");
         }
 
-        ColaboradorDAO colaboradorDAO = new ColaboradorDAO();
+        colaboradorDAO = new ColaboradorDAO();
         ColaboradorTO colaborador = colaboradorDAO.findById(lembreteTO.getIdColaborador());
         if (colaborador == null) {
             throw new ColaboradorException("Não existe um colaborador com o id informado.");
         }
 
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         PacienteTO paciente = pacienteDAO.findById(atendimento.getIdPaciente());
         if (paciente == null) {
             throw new PacienteException("Paciente vinculado ao atendimento não foi encontrado.");
         }
 
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         ProfissionalSaudeTO profissional = profissionalSaudeDAO.findById(atendimento.getIdProfissionalSaude());
         if (profissional == null) {
             throw new ProfissionalSaudeException("Profissional vinculado ao atendimento não foi encontrado.");
@@ -58,7 +65,7 @@ public class LembreteBO {
         lembreteTO.setDataEnvio(LocalDate.now());
         lembreteTO.setStatus(StatusLembrete.ENVIADO);
 
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         return lembreteDAO.save(lembreteTO);
     }
 
@@ -66,21 +73,21 @@ public class LembreteBO {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         LembreteTO lembrete = lembreteDAO.findById(id);
 
         if (lembrete == null) {
             throw new LembreteException("Não existe nenhum lembrete com o ID informado.");
         }
 
-        AtendimentoDAO atendimentoDAO = new AtendimentoDAO();
+        atendimentoDAO = new AtendimentoDAO();
         AtendimentoTO atendimento = atendimentoDAO.findById(lembrete.getIdAtendimento());
 
-        ProfissionalSaudeDAO profissionalSaudeDAO = new ProfissionalSaudeDAO();
+        profissionalSaudeDAO = new ProfissionalSaudeDAO();
         ProfissionalSaudeTO profissional = profissionalSaudeDAO.findById(atendimento.getIdProfissionalSaude());
 
 
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         PacienteTO paciente = pacienteDAO.findById(atendimento.getIdPaciente());
 
         String assunto = String.format(" IMREA: Consulta com %s dia %s",
@@ -108,32 +115,32 @@ public class LembreteBO {
     }
 
     public boolean delete(Long id) {
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         if (lembreteDAO.findById(id) == null) {
             return false;
         }
         return lembreteDAO.delete(id);
     }
     public LembreteTO findById(Long id) {
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         return lembreteDAO.findById(id);
     }
 
     public ArrayList<LembreteTO> findAllByPaciente(Long idPaciente) throws PacienteException {
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         if (pacienteDAO.findById(idPaciente) == null) {
             throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         return lembreteDAO.findAllByPaciente(idPaciente);
     }
 
     public LembreteTO findUltimoByPaciente(Long idPaciente) throws PacienteException {
-        PacienteDAO pacienteDAO = new PacienteDAO();
+        pacienteDAO = new PacienteDAO();
         if (pacienteDAO.findById(idPaciente) == null) {
             throw new PacienteException("Não existe nenhum paciente com o ID informado");
         }
-        LembreteDAO lembreteDAO = new LembreteDAO();
+        lembreteDAO = new LembreteDAO();
         return lembreteDAO.findUltimoByPaciente(idPaciente);
     }
 

@@ -51,9 +51,9 @@ public class AcompanhanteResource {
     }
 
     @DELETE
-    @Path("/{codigo}")
-    public Response delete(@PathParam("codigo") Long codigo) {
-        if (acompanhanteBO.delete(codigo)) {
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+        if (acompanhanteBO.delete(id)) {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();

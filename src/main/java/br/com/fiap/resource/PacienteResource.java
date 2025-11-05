@@ -50,10 +50,10 @@ public class PacienteResource {
     }
 
     @DELETE
-    @Path("/{codigo}")
-    public Response delete(@PathParam("codigo") Long codigo) {
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
         try{
-            if (pacienteBO.delete(codigo)) {
+            if (pacienteBO.delete(id)) {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
             return Response.status(Response.Status.NOT_FOUND).build();

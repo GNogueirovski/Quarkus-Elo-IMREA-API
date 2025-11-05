@@ -23,6 +23,16 @@ public class LembreteTO {
     public LembreteTO() {
     }
 
+    public LembreteTO(Long idLembrete, Long idColaborador, Long idAtendimento, String assunto, String mensagem, LocalDate dataEnvio, StatusLembrete status) {
+        this.idLembrete = idLembrete;
+        this.idColaborador = idColaborador;
+        this.idAtendimento = idAtendimento;
+        this.assunto = assunto;
+        this.mensagem = mensagem;
+        this.dataEnvio = dataEnvio;
+        this.status = status;
+    }
+
     public Long getIdLembrete() {
         return idLembrete;
     }
