@@ -37,6 +37,7 @@ public class AtendimentoBO {
         if (atendimentoTO.getData().isBefore(LocalDate.now())) {
             throw new AtendimentoException("Não é possível agendar um atendimento em uma data passada.");
         }
+
         atendimentoDAO = new AtendimentoDAO();
 
         // verifica se o paciente ja tem outro atendimento no mesmo horario
