@@ -19,7 +19,7 @@ public class ColaboradorDAO {
 
         String sql = "insert into T_ELO_COLABORADOR (nc_nome_completo, dt_data_nascimento, dc_cpf, tl_telefone, em_email,url_foto, un_unidade) values (?,?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[]{"ID_COLABORADOR"})) {
             ps.setString(1, colaboradorTO.getNomeCompleto());
             ps.setDate(2, Date.valueOf(colaboradorTO.getDataNascimento()));
             ps.setString(3, colaboradorTO.getCpf());
@@ -33,6 +33,11 @@ public class ColaboradorDAO {
             ps.setString(7, colaboradorTO.getUnidade());
 
             if (ps.executeUpdate() > 0) {
+                try(ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        colaboradorTO.setIdColaborador(rs.getLong(1));
+                    }
+                }
                 return colaboradorTO;
             }
             return null;

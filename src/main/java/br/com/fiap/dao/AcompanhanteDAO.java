@@ -19,7 +19,8 @@ public class AcompanhanteDAO {
 
         String sql = "insert into T_ELO_ACOMPANHANTE (nc_nome_completo, dt_data_nascimento, dc_cpf, tl_telefone, em_email, url_foto, pr_parentesco, id_paciente) values (?,?,?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[]{"ID_ACOMPANHANTE"})) {
+
             ps.setString(1, acompanhanteTO.getNomeCompleto());
             ps.setDate(2, Date.valueOf(acompanhanteTO.getDataNascimento()));
             ps.setString(3, acompanhanteTO.getCpf());
@@ -34,16 +35,21 @@ public class AcompanhanteDAO {
             ps.setLong(8, acompanhanteTO.getIdPaciente());
 
             if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        acompanhanteTO.setIdAcompanhante(rs.getLong(1));
+                    }
+                }
                 return acompanhanteTO;
             }
             return null;
+
         } catch (SQLException e) {
             System.out.println("Erro ao Salvar: " + e.getMessage());
             throw new RuntimeException(e.getMessage());
         } finally {
             ConnectionFactory.closeConnection();
         }
-
     }
 
     /**

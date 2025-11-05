@@ -19,7 +19,7 @@ public class LembreteDAO {
     public LembreteTO save(LembreteTO lembreteTO) {
         String sql = "insert into T_ELO_LEMBRETE (as_assunto, ms_mensagem, dt_data_envio, st_status, id_colaborador, id_atendimento) values (?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[]{"ID_LEMBRETE"})) {
             ps.setString(1, lembreteTO.getAssunto());
             ps.setString(2, lembreteTO.getMensagem());
             ps.setDate(3, Date.valueOf(lembreteTO.getDataEnvio()));
@@ -27,6 +27,11 @@ public class LembreteDAO {
             ps.setLong(5, lembreteTO.getIdColaborador());
             ps.setLong(6, lembreteTO.getIdAtendimento());
             if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        lembreteTO.setIdLembrete(rs.getLong(1));
+                    }
+                }
                 return lembreteTO;
             }return null;
         } catch (SQLException e) {

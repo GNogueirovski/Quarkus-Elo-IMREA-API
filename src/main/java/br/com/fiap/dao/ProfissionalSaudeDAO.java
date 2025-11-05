@@ -18,7 +18,7 @@ public class ProfissionalSaudeDAO {
 
         String sql = "insert into T_ELO_PROFISSIONAL_SAUDE (nc_nome_completo, dt_data_nascimento, dc_cpf, tl_telefone, em_email,url_foto, tp_tipo_documento, nm_documento, es_especialidade) values (?, ?, ?,?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[]{"ID_PROFISSIONAL_SAUDE"})) {
             ps.setString(1, profissionalSaude.getNomeCompleto());
             ps.setDate(2, Date.valueOf(profissionalSaude.getDataNascimento()));
             ps.setString(3, profissionalSaude.getCpf());
@@ -34,6 +34,11 @@ public class ProfissionalSaudeDAO {
             ps.setString(9, profissionalSaude.getEspecialidade());
 
             if (ps.executeUpdate() > 0) {
+                try(ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        profissionalSaude.setIdProfissionalSaude(rs.getLong(1));
+                    }
+                }
                 return profissionalSaude;
             }
             return null;

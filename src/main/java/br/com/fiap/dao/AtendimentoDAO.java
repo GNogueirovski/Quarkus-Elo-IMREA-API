@@ -20,7 +20,7 @@ public class AtendimentoDAO {
 
         String sql = "insert into T_ELO_ATENDIMENTO (id_paciente, id_profissional_saude, fm_formato_atendimento, dt_data, hr_hora, lc_local, st_status) values (?,?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[]{"ID_ATENDIMENTO"})) {
             ps.setLong(1, atendimentoTO.getIdPaciente());
             ps.setLong(2, atendimentoTO.getIdProfissionalSaude());
             ps.setString(3, String.valueOf(atendimentoTO.getFormatoAtendimento()));
@@ -29,6 +29,11 @@ public class AtendimentoDAO {
             ps.setString(6, atendimentoTO.getLocal());
             ps.setString(7, atendimentoTO.getStatus().name());
             if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        atendimentoTO.setIdAtendimento(rs.getLong(1));
+                    }
+                }
                 return atendimentoTO;
             }
             return null;

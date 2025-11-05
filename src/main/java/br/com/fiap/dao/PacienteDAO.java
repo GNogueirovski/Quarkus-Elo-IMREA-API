@@ -17,7 +17,7 @@ public class PacienteDAO {
 
         String sql = "insert into T_ELO_PACIENTE (nc_nome_completo, dt_data_nascimento, dc_cpf, tl_telefone, em_email,url_foto, dg_diagnostico) values (?,?,?,?,?,?,?)";
 
-        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement ps = ConnectionFactory.getConnection().prepareStatement(sql, new String[] {"ID_PACIENTE"})) {
             ps.setString(1, pacienteTO.getNomeCompleto());
             ps.setDate(2, Date.valueOf(pacienteTO.getDataNascimento()));
             ps.setString(3, pacienteTO.getCpf());
@@ -30,6 +30,11 @@ public class PacienteDAO {
             }
             ps.setString(7, pacienteTO.getDiagnostico());
             if (ps.executeUpdate() > 0) {
+                try(ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        pacienteTO.setIdPaciente(rs.getLong(1));
+                    }
+                }
                 return pacienteTO;
             }
             return null;

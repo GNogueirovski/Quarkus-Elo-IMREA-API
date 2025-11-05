@@ -31,8 +31,6 @@ public class ConnectionFactory {
             if (URL == null || USERNAME == null || PASSWORD == null) {
                 throw new RuntimeException("Variáveis de ambiente do banco não configuradas.");
             }
-
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
             System.out.println("Erro de SQL: " + e.getMessage());
         } catch (ClassNotFoundException e) {
