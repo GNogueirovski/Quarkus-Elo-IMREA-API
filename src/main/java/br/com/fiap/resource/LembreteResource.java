@@ -50,7 +50,7 @@ public class LembreteResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
             return Response.status(Response.Status.OK).entity(resultado).build();
-        } catch (LembreteException e) {
+        } catch (LembreteException | AtendimentoException | ProfissionalSaudeException | PacienteException e) {
             ErrorResponse errorResponse = new ErrorResponse(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }

@@ -8,9 +8,20 @@ import br.com.fiap.to.ColaboradorTO;
 
 import java.util.ArrayList;
 
+/**
+ * Classe de com regras de negócio para gerenciar colaboradores e utilizar os métodos DAO para realizar as ações com banco de dados.
+ * @version 1.0
+ */
 public class ColaboradorBO {
     private ColaboradorDAO colaboradorDAO;
 
+    /**
+     * Salva um novo colaborador no sistema após validar os dados.
+     *
+     * @param colaboradorTO Objeto de ColaboradorTO com os dados do colaborador a ser salvo.
+     * @return O objeto ColaboradorTO salvo com o ID gerado.
+     * @throws ColaboradorException Se o CPF já estiver cadastrado no sistema.
+     */
     public ColaboradorTO save(ColaboradorTO colaboradorTO) throws ColaboradorException {
         String telefone = colaboradorTO.getTelefone().replace("(", "").replace("-", "").replace(")", "").replace(" ", "");
         String cpf = colaboradorTO.getCpf().replace(".", "").replace("-", "");
@@ -27,6 +38,12 @@ public class ColaboradorBO {
         return colaboradorDAO.save(colaboradorTO);
     }
 
+    /**
+     * Atualiza os dados de um colaborador existente após validar os dados.
+     * @param colaboradorTO Objeto de ColaboradorTO com os dados do colaborador a ser atualizado.
+     * @return O objeto ColaboradorTO atualizado.
+     * @throws ColaboradorException Se o colaborador não existir ou se o CPF já estiver cadastrado para outro colaborador.
+     */
     public ColaboradorTO update(ColaboradorTO colaboradorTO) throws ColaboradorException {
         String telefone = colaboradorTO.getTelefone().replace("(", "").replace("-", "").replace(")", "").replace(" ", "");
         String cpf = colaboradorTO.getCpf().replace(".", "").replace("-", "");
@@ -45,6 +62,12 @@ public class ColaboradorBO {
 
         return colaboradorDAO.update(colaboradorTO);
     }
+    /**
+     * Exclui um colaborador do sistema após verificar se ele existe e se não possui lembretes vinculados.
+     * @param id ID do colaborador a ser excluído.
+     * @return true se o colaborador foi excluído com sucesso, false se o colaborador não existir.
+     * @throws ColaboradorException Se existirem lembretes vinculados ao colaborador.
+     */
     public boolean delete(Long id) throws ColaboradorException {
         colaboradorDAO = new ColaboradorDAO();
         if (colaboradorDAO.findById(id) == null) {
@@ -58,11 +81,20 @@ public class ColaboradorBO {
         return colaboradorDAO.delete(id);
     }
 
+    /**
+     * Retorna uma lista de todos os colaboradores cadastrados no sistema.
+     * @return Uma lista de objetos ColaboradorTO.
+     */
     public ArrayList<ColaboradorTO> findAll() {
         colaboradorDAO = new ColaboradorDAO();
         return colaboradorDAO.findAll();
     }
 
+    /**
+     * Busca um colaborador pelo seu ID.
+     * @param id ID do colaborador a ser buscado.
+     * @return O objeto ColaboradorTO correspondente ao ID informado, ou null se não encontrado.
+     */
     public ColaboradorTO findById(Long id) {
         colaboradorDAO = new ColaboradorDAO();
         return colaboradorDAO.findById(id);

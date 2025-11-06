@@ -14,7 +14,7 @@ public class ConnectionFactory {
                 connection.close();
             }
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Erro ao fechar a conexão: " + e.getMessage());
         }
     }
 
@@ -28,10 +28,10 @@ public class ConnectionFactory {
             final String USERNAME = System.getenv("DB_USER");
             final String PASSWORD = System.getenv("DB_PASSWORD");
             if (URL == null || USERNAME == null || PASSWORD == null) {
-                throw new RuntimeException("Variáveis de ambiente do banco não configuradas.");
+               throw new RuntimeException("Variáveis de ambiente do banco não configuradas.");
             }
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            
+
         } catch (SQLException e) {
             System.out.println("Erro de SQL: " + e.getMessage());
         } catch (ClassNotFoundException e) {
