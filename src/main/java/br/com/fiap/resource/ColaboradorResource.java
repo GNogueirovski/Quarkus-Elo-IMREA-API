@@ -66,8 +66,12 @@ public class ColaboradorResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAll() {
-        ArrayList<ColaboradorTO> resultado = colaboradorBO.findAll();
-        return Response.status(Response.Status.OK).entity(resultado).build();
+        try{
+            ArrayList<ColaboradorTO> resultado = colaboradorBO.findAll();
+            return Response.status(Response.Status.OK).entity(resultado).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GET
