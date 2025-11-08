@@ -15,10 +15,10 @@ public abstract class PessoaTO {
     @PastOrPresent (message = "A data de nascimento obrigatoriamente tem que ser no passado")
     private LocalDate dataNascimento;
     @NotBlank (message = "O atributo CPF é obrigatório")
-    @Max(value = 11, message = "O atributo CPF pode ter no máximo 11 digitos")
+    @Size(max = 11, message = "O atributo CPF pode ter no máximo 11 digitos")
     private String cpf;
     @NotBlank (message = "O atributo telefone é obrigatório")
-    @Max(value = 11, message = "O atributo telefone pode ter no máximo 11 digitos")
+    @Size(max = 11, message = "O atributo telefone pode ter no máximo 11 digitos")
     private String telefone;
     @Email (message = "O atributo e-mail deve seguir um formato válido")
     @NotNull (message = "O atributo e-mail é obrigatório")
